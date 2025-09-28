@@ -13,58 +13,62 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.io.Buffer
 
-data class NMDNSServer(
+data class NMDNSAnnouncer(
     /**
      * coroutine dispatcher for running server
      */
-    val dispatcher: CoroutineDispatcher = Dispatchers.Default,
+    internal val dispatcher: CoroutineDispatcher = Dispatchers.Default,
     /**
      * service type
-     * default airplay
+     * airplay service type: _airplay._tcp.local.
      */
-    val serviceType: String = "_airplay._tcp.local.",
+    internal val serviceType: String,
     /**
      * service name
-     * finally: $serviceName.$serviceType
      */
-    val serviceName: String = "APS",
+    internal val serviceName: String,
     /**
      * local hostname
      */
-    val hostname: String,
+    internal val hostname: String,
     /**
      * service ip, lan ip mostly
      */
-    val ipAddress: String,
+    internal val ipAddress: String,
     /**
      * service port
      */
-    val port: Int = 7004,
+    internal val port: Int = 7004,
     /**
      * mdns server port
      */
-    val mdnsPort: Int = 3025,
+    internal val mdnsPort: Int = 3025,
     /**
-     * Txt record content
+     * txt record content
      */
-    val txtRecords: List<String> = listOf(
-        "deviceid=01:23:45:67:89:AB",
-        "model=AppleTV3,2C",
-        "features=0x5A7FFFF7,0x1E",
-        "srcvers=220.68",
-        "pk=f3769a660475d27b4f6040381d784645e13e21c53e6d2da6a8c3d757086fc336"
-    ),
+    internal val txtRecords: List<String>,
     /**
      * mdns socket server
      */
-    val server: BoundDatagramSocket,
+    internal val server: BoundDatagramSocket,
     /**
      * srv packet
      */
-    val packet: Buffer,
+    internal val packet: Buffer,
 )
 
-suspend fun createService(
+/**
+ * register service
+ * airplay2 txt records
+ * listOf(
+ *     "deviceid=${randomMacAddress()}",
+ *     "model=AppleTV3,2C",
+ *     "features=0x5A7FFFF7,0x1E",
+ *     "srcvers=220.68",
+ *     "pk=f3769a660475d27b4f6040381d784645e13e21c53e6d2da6a8c3d757086fc336"
+ * )
+ */
+suspend fun registerService(
     serviceType: String,
     serviceName: String,
     hostname: String,
@@ -72,25 +76,29 @@ suspend fun createService(
     port: Int,
     mdnsPort: Int = 9872,
     bindAddress: String,
-    txtRecords: List<String> = listOf(
-        "deviceid=${randomMacAddress()}",
-        "model=AppleTV3,2C",
-        "features=0x5A7FFFF7,0x1E",
-        "srcvers=220.68",
-        "pk=f3769a660475d27b4f6040381d784645e13e21c53e6d2da6a8c3d757086fc336"
-    ),
-): NMDNSServer {
+    txtRecords: List<String>,
+): NMDNSAnnouncer {
     val manager = SelectorManager(Dispatchers.Default)
     val serverSocket = aSocket(manager).udp()
         .bind(InetSocketAddress(bindAddress, mdnsPort))
-    return NMDNSServer(
-        Dispatchers.Default, serviceType, serviceName,
-        hostname, ipAddress, port, mdnsPort,
-        txtRecords, serverSocket, buildPacket(serviceType, "$serviceName.$serviceType", hostname, ipAddress, port, txtRecords)
+    return NMDNSAnnouncer(
+        Dispatchers.Default,
+        serviceType,
+        serviceName,
+        hostname,
+        ipAddress,
+        port,
+        mdnsPort,
+        txtRecords,
+        serverSocket,
+        buildPacket(serviceType, "$serviceName.$serviceType", hostname, ipAddress, port, txtRecords)
     )
 }
 
-suspend fun NMDNSServer.broadcast() {
+/**
+ * broadcast packet
+ */
+suspend fun NMDNSAnnouncer.broadcast() {
     this.server.send(Datagram(packet.copy(), InetSocketAddress("224.0.0.251", 5353)))
 }
 

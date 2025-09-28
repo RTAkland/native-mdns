@@ -40,4 +40,7 @@ private val macAddresses = listOf(
     "c3:c9:1c:3d:ae:dd"
 )
 
+/**
+ * get random mac address
+ */
 fun randomMacAddress(): String = macAddresses.random()
