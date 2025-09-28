@@ -1,9 +1,9 @@
 # native-mdns
 
 A Kotlin multiplatform library for mdns announcer(mdns server), only broadcast is supported, 
-it depends on ktor-network.
+it depends on ktor-network.About
 
-Also, nmdns can be compiled to shared/static lib for other language usage, see [build.gradle.kts](build.gradle.kts)
+Also, nmdns can be compiled to shared/static lib for other language calling, see [build.gradle.kts](build.gradle.kts)
 
 Supported platforms:
 1. windows64(mingwx64)
