@@ -40,3 +40,21 @@ kotlin {
     }
 }
 ```
+
+There is a simple airplay2 service
+
+```kotlin
+            val service = createService(
+                serviceType = "_airplay._tcp.local.",
+                serviceName = "AP@RTAST",
+                hostname = "rtakland.local.",
+                ipAddress = "192.168.10.104",
+                port = 7001,
+                bindAddress = "192.168.10.104",
+                mdnsPort = 5356,
+            )
+            while (true) {
+                service.broadcast()
+                delay(2000L)
+            }
+```
