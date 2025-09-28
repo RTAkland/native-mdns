@@ -57,6 +57,7 @@ val service = registerService(
     port = 7001,
     bindAddress = "192.168.10.104",
     mdnsPort = 5356,
+    txtRecords = listOf("key1=value1", "key2=value2")
 )
 while (true) {
     service.broadcast()
