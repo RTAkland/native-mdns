@@ -1,9 +1,12 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 plugins {
     kotlin("multiplatform") version "2.2.10"
+    id("maven-publish")
 }
 
 group = "cn.rtast.nmdns"
-version = "1.0-SNAPSHOT"
+version = "0.0.1"
 
 repositories {
     mavenCentral()
@@ -14,7 +17,7 @@ kotlin {
     linuxX64()
     mingwX64()
     macosArm64()
-    jvm()
+    jvm { compilerOptions { jvmTarget = JvmTarget.JVM_11 } }
 
     sourceSets {
         commonMain.dependencies {
@@ -23,6 +26,19 @@ kotlin {
 
         commonTest.dependencies {
             implementation(kotlin("test"))
+        }
+    }
+}
+
+publishing {
+    repositories {
+        mavenLocal()
+        maven("https://repo.maven.rtast.cn/releases") {
+            name = "RTAST"
+            credentials {
+                username = "RTAkland"
+                password = System.getenv("PUBLISH_TOKEN")
+            }
         }
     }
 }
