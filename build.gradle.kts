@@ -17,7 +17,8 @@ kotlin {
         linuxArm64(),
         linuxX64(),
         mingwX64(),
-        macosArm64()
+        macosArm64(),
+        macosX64()
     )
     jvm { compilerOptions { jvmTarget = JvmTarget.JVM_11 } }
 

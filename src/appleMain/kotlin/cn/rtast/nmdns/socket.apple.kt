@@ -34,7 +34,7 @@ public actual class Socket1 internal actual constructor() {
             val addr = alloc<sockaddr_in>()
             addr.sin_family = AF_INET.convert()
             addr.sin_port = htons(port.toUShort())
-            addr.sin_addr.s_addr = htonl(INADDR_ANY)
+            addr.sin_addr.s_addr = inet_addr(ip)
             if (bind(socket, addr.ptr.reinterpret(), sizeOf<sockaddr_in>().convert()) < 0) {
                 perror("Failed to bind")
                 close(socket)
@@ -43,8 +43,8 @@ public actual class Socket1 internal actual constructor() {
         memScoped {
             val mreq = alloc<ip_mreq>()
             mreq.imr_multiaddr.s_addr = inet_addr("224.0.0.251")
-            mreq.imr_interface.s_addr = htonl(INADDR_ANY)
-            if (setsockopt(socket, IPPROTO_TP, IP_ADD_MEMBERSHIP, mreq.ptr, sizeOf<ip_mreq>().convert()) < 0) {
+            mreq.imr_interface.s_addr = inet_addr(ip)
+            if (setsockopt(socket, IPPROTO_IP, IP_ADD_MEMBERSHIP, mreq.ptr, sizeOf<ip_mreq>().convert()) < 0) {
                 perror("setsockopt IP_ADD_MEMBERSHIP")
             }
         }

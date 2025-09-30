@@ -2,14 +2,15 @@
 
 A Kotlin multiplatform library for mdns announcer(mdns server), only broadcast is supported, 
 
-Also, nmdns can be compiled to shared/static lib for other language calling, see [build.gradle.kts](build.gradle.kts)
+Also, nmdns can be compiled to shared/static lib for other language calling, see [c++ example](#cpp)
 
 Supported platforms:
 1. windows64(mingwx64)
 2. linuxX64
 3. linuxArm64
 4. macosArm64
-5. jvm(11 or later)
+5. macosX64
+6. jvm(11 or later)
 
 Supported srv type
 1. A
@@ -64,7 +65,7 @@ while (true) {
 }
 ```
 
-# C++
+# cpp
 
 ```cpp
 #include <csignal>
