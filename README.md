@@ -2,7 +2,9 @@
 
 A Kotlin multiplatform library for mdns announcer(mdns server), only broadcast is supported, 
 
-Also, nmdns can be compiled to shared/static lib for other language calling, see [c++ example](#cpp)
+Also, nmdns can be compiled to shared/static lib for other languages calling, see [c++ example](#cpp)
+
+mDNS is usually used for Apple's AirPlay protocol family, there's an example in README.md [How to use](#How-to-use) 
 
 Supported platforms:
 1. windows64(mingwx64)
@@ -22,16 +24,7 @@ AirPlay2(_airplay._tcp.local.) is tested
 
 # How to use
 
-Add maven repository
-
-```kotlin
-repositories {
-    mavenCentral()
-    maven("https://repo.maven.rtast.cn/releases")
-}
-```
-
-Add dependency
+> Make sure you added the mavenCentral repository in your project
 
 ```kotlin
 kotlin {
