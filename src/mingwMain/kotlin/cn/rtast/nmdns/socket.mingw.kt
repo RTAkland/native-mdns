@@ -36,13 +36,11 @@ public actual class Socket1 internal actual constructor() {
             WSACleanup()
         }
 
-        val reuse = nativeHeap.alloc<IntVar>()
-        reuse.value = 1
         val result = setsockopt(
             sock,
             SOL_SOCKET,
             SO_REUSEADDR,
-            reuse.ptr.reinterpret<ByteVar>().toKString(),
+            "1",
             sizeOf<IntVar>().convert()
         )
         if (result != 0) println("setsockopt failed")
@@ -66,7 +64,7 @@ public actual class Socket1 internal actual constructor() {
         if (!bound) throw IllegalStateException("Socket not bound")
         val dest = alloc<SOCKADDR_IN>()
         dest.sin_family = AF_INET.convert()
-        dest.sin_port = 5353u
+        dest.sin_port = htons(5353u)
         dest.sin_addr.S_un.S_addr = inet_addr("224.0.0.251")
         packet.usePinned { pinned ->
             val sent = sendto(
