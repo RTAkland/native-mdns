@@ -14,9 +14,11 @@ Supported platforms:
 5. macosX64
 6. jvm(11 or later)
 
-Supported srv type
+Supported record type
 1. A
 2. PTR
+3. SRV
+4. TXT
 
 > AAAA is not supported
 
