@@ -40,7 +40,7 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
-            implementation("cn.rtast.nmdns:native-mdns:0.0.2")
+            implementation("cn.rtast.nmdns:native-mdns:<version>")
         }
     }
 }
