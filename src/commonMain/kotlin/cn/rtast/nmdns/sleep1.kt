@@ -11,4 +11,5 @@ package cn.rtast.nmdns
  * block current thread
  * unit: second
  */
-internal expect fun sleep1(time: Int)
+
+public expect fun sleep1(time: Int)

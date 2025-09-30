@@ -7,7 +7,10 @@
 package cn.rtast.nmdns
 
 import platform.posix.sleep
+import kotlin.experimental.ExperimentalNativeApi
 
-actual fun sleep1(time: Int) {
+@OptIn(ExperimentalNativeApi::class)
+@CName("sleep1")
+public actual fun sleep1(time: Int) {
     sleep(time.toUInt())
 }

@@ -6,6 +6,6 @@
 
 package cn.rtast.nmdns
 
-actual fun sleep1(time: Int) {
+public actual fun sleep1(time: Int) {
     Thread.sleep(time * 1000L)
 }

@@ -5,19 +5,14 @@
  */
 
 
+@file:OptIn(ExperimentalNativeApi::class)
+
 package cn.rtast.nmdns
 
-import io.ktor.network.selector.*
-import io.ktor.network.sockets.*
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Dispatchers
-import kotlinx.io.Buffer
+import kotlin.experimental.ExperimentalNativeApi
+import kotlin.native.CName
 
-data class NMDNSAnnouncer(
-    /**
-     * coroutine dispatcher for running server
-     */
-    internal val dispatcher: CoroutineDispatcher = Dispatchers.Default,
+public data class NMDNSAnnouncer(
     /**
      * service type
      * airplay service type: _airplay._tcp.local.
@@ -50,12 +45,60 @@ data class NMDNSAnnouncer(
     /**
      * mdns socket server
      */
-    internal val server: BoundDatagramSocket,
+    internal val server: Socket1,
     /**
      * srv packet
      */
-    internal val packet: Buffer,
-)
+    internal val packet: ByteArray,
+) {
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other == null || this::class != other::class) return false
+
+        other as NMDNSAnnouncer
+
+        if (port != other.port) return false
+        if (mdnsPort != other.mdnsPort) return false
+        if (serviceType != other.serviceType) return false
+        if (serviceName != other.serviceName) return false
+        if (hostname != other.hostname) return false
+        if (ipAddress != other.ipAddress) return false
+        if (txtRecords != other.txtRecords) return false
+        if (server != other.server) return false
+        if (!packet.contentEquals(other.packet)) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = port
+        result = 31 * result + mdnsPort
+        result = 31 * result + serviceType.hashCode()
+        result = 31 * result + serviceName.hashCode()
+        result = 31 * result + hostname.hashCode()
+        result = 31 * result + ipAddress.hashCode()
+        result = 31 * result + txtRecords.hashCode()
+        result = 31 * result + server.hashCode()
+        result = 31 * result + packet.contentHashCode()
+        return result
+    }
+
+    /**
+     * broadcast packet
+     */
+    public fun broadcast() {
+        this.server.send(packet)
+    }
+}
+
+/**
+ * export for c
+ */
+@CExport
+@CName("broadcast")
+public fun broadcast1(server: NMDNSAnnouncer) {
+    server.server.send(server.packet)
+}
 
 /**
  * register service
@@ -68,7 +111,8 @@ data class NMDNSAnnouncer(
  *     "pk=f3769a660475d27b4f6040381d784645e13e21c53e6d2da6a8c3d757086fc336"
  * )
  */
-suspend fun registerService(
+@CName("register_service")
+public fun registerService(
     serviceType: String,
     serviceName: String,
     hostname: String,
@@ -78,11 +122,9 @@ suspend fun registerService(
     bindAddress: String,
     txtRecords: List<String>,
 ): NMDNSAnnouncer {
-    val manager = SelectorManager(Dispatchers.Default)
-    val serverSocket = aSocket(manager).udp()
-        .bind(InetSocketAddress(bindAddress, mdnsPort))
+    val server = createSocket()
+        .bind(bindAddress, port)
     return NMDNSAnnouncer(
-        Dispatchers.Default,
         serviceType,
         serviceName,
         hostname,
@@ -90,16 +132,9 @@ suspend fun registerService(
         port,
         mdnsPort,
         txtRecords,
-        serverSocket,
+        server,
         buildPacket(serviceType, "$serviceName.$serviceType", hostname, ipAddress, port, txtRecords)
     )
-}
-
-/**
- * broadcast packet
- */
-suspend fun NMDNSAnnouncer.broadcast() {
-    this.server.send(Datagram(packet.copy(), InetSocketAddress("224.0.0.251", 5353)))
 }
 
 internal fun buildPacket(
@@ -109,7 +144,7 @@ internal fun buildPacket(
     ip: String,
     port: Int,
     txtRecords: List<String>,
-): Buffer {
+): ByteArray {
     val records = mutableListOf<ByteArray>()
     records += encodeRR(serviceType, 12, encodeName(serviceName))
 
@@ -133,8 +168,7 @@ internal fun buildPacket(
     header[6] = ((records.size shr 8) and 0xFF).toByte()
     header[7] = (records.size and 0xFF).toByte()
 
-    val buffer = Buffer().apply { write(header + records.reduce { acc, r -> acc + r }) }
-    return buffer
+    return header + records.reduce { acc, r -> acc + r }
 }
 
 internal fun encodeRR(name: String, type: Int, data: ByteArray): ByteArray {

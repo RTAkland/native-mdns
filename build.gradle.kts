@@ -1,12 +1,12 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
-    kotlin("multiplatform") version "2.2.10"
+    kotlin("multiplatform") version "2.2.0"
     id("maven-publish")
 }
 
 group = "cn.rtast.nmdns"
-version = "0.0.2"
+version = "0.1.0"
 
 repositories {
     mavenCentral()
@@ -32,9 +32,13 @@ kotlin {
         }
     }
 
+    compilerOptions { freeCompilerArgs.addAll("-Xexpect-actual-classes") }
+
+    explicitApi()
+
     sourceSets {
         commonMain.dependencies {
-            implementation("io.ktor:ktor-network:3.2.3")
+
         }
 
         commonTest.dependencies {

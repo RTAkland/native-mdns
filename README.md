@@ -1,7 +1,6 @@
 # native-mdns
 
 A Kotlin multiplatform library for mdns announcer(mdns server), only broadcast is supported, 
-it depends on ktor-network.About
 
 Also, nmdns can be compiled to shared/static lib for other language calling, see [build.gradle.kts](build.gradle.kts)
 
@@ -62,5 +61,52 @@ val service = registerService(
 while (true) {
     service.broadcast()
     delay(2000L) // or use cn.rtast.nmdns.sleep1(2) sleep 2 seconds
+}
+```
+
+# C++
+
+```cpp
+#include <csignal>
+#include <cstdio>
+#include "libnmdns_api.h"
+
+volatile sig_atomic_t keepRunning = 1;
+
+void handle_sigint(int sig) {
+    std::printf("\nCaught signal %d, exiting...\n", sig);
+    keepRunning = 0;
+}
+
+int main() {
+    libnmdns_kref_kotlin_collections_List txt = create_txt_records();
+
+    add_txt_record(txt, "deviceid=ef:42:0d:76:f1:97");
+    add_txt_record(txt, "model=AppleTV3,2C");
+    add_txt_record(txt, "features=0x5A7FFFF7,0x1E");
+    add_txt_record(txt, "srcvers=220.68");
+    add_txt_record(txt, "pk=f3769a660475d27b4f6040381d784645e13e21c53e6d2da6a8c3d757086fc336");
+
+    libnmdns_kref_cn_rtast_nmdns_NMDNSAnnouncer service = register_service(
+        "_airplay._tcp.local.",
+        "AP@RTAST",
+        "rtakland.local.",
+        "192.168.10.104",
+        7001, 3652, "192.168.10.104",
+        txt
+    );
+
+    std::signal(SIGINT, handle_sigint); 
+    std::signal(SIGTERM, handle_sigint);
+    std::signal(SIGHUP, handle_sigint);
+    std::signal(SIGQUIT, handle_sigint);
+
+    std::printf("Running... Press Ctrl+C to exit\n");
+
+    while (keepRunning) {
+        broadcast(service);
+        sleep1(2);
+    }
+    return 0;
 }
 ```
