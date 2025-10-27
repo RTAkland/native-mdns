@@ -56,7 +56,7 @@ val service = registerService(
 )
 while (true) {
     service.broadcast()
-    delay(2000L) // or use cn.rtast.nmdns.sleep1(2) sleep 2 seconds
+    delay(2000L) // or use cn.rtast.nmdns.sleep1(2) sleep 2 seconds, this function is not a suspended function
 }
 ```
 
