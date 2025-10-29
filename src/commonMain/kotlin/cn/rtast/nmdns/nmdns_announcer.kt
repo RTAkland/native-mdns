@@ -12,6 +12,7 @@ package cn.rtast.nmdns
 import kotlin.experimental.ExperimentalNativeApi
 import kotlin.native.CName
 
+
 public data class NMDNSAnnouncer(
     /**
      * service type
@@ -89,15 +90,33 @@ public data class NMDNSAnnouncer(
     public fun broadcast() {
         this.server.send(packet)
     }
+
+    /**
+     * unregister service
+     */
+    public fun unregister() {
+        this.server.destroy()
+    }
 }
 
 /**
+ * broadcast packet
  * export for c
  */
 @CExport
 @CName("broadcast")
 public fun broadcast1(server: NMDNSAnnouncer) {
     server.server.send(server.packet)
+}
+
+/**
+ * unregister service
+ * export for c
+ */
+@CExport
+@CName("unregister")
+public fun unregister1(server: NMDNSAnnouncer) {
+    server.unregister()
 }
 
 /**
@@ -133,7 +152,7 @@ public fun registerService(
         mdnsPort,
         txtRecords,
         server,
-        buildPacket(serviceType, "$serviceName.$serviceType", hostname, ipAddress, port, txtRecords)
+        buildPacket(serviceType, "$serviceName.$serviceType", hostname, ipAddress, port, txtRecords),
     )
 }
 
