@@ -7,6 +7,9 @@
 
 package test
 
+import cn.rtast.nmdns.onBroadcast
+import cn.rtast.nmdns.onRegister
+import cn.rtast.nmdns.onUnregistered
 import cn.rtast.nmdns.randomMacAddress
 import cn.rtast.nmdns.registerService
 import cn.rtast.nmdns.sleep1
@@ -30,7 +33,19 @@ class TestLinux {
                 "srcvers=220.68",
                 "pk=f3769a660475d27b4f6040381d784645e13e21c53e6d2da6a8c3d757086fc336"
             )
-        )
+        ) {
+            onBroadcast {
+                println(111)
+            }
+
+            onRegister {
+                println("reg")
+            }
+
+            onUnregistered {
+                println("unreg")
+            }
+        }
         while (true) {
             service.broadcast()
             sleep1(2)

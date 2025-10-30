@@ -12,6 +12,17 @@ package cn.rtast.nmdns
 import kotlin.experimental.ExperimentalNativeApi
 import kotlin.native.CName
 
+public fun NMDNSAnnouncer.onRegister(callback: () -> Unit) {
+    onRegisterCallback = callback
+}
+
+public fun NMDNSAnnouncer.onBroadcast(callback: () -> Unit) {
+    onBroadcastCallback = callback
+}
+
+public fun NMDNSAnnouncer.onUnregistered(callback: () -> Unit) {
+    onUnregisterCallback = callback
+}
 
 public data class NMDNSAnnouncer(
     /**
@@ -52,6 +63,11 @@ public data class NMDNSAnnouncer(
      */
     internal val packet: ByteArray,
 ) {
+
+    internal var onRegisterCallback: (() -> Unit)? = null
+    internal var onBroadcastCallback: (() -> Unit)? = null
+    internal var onUnregisterCallback: (() -> Unit)? = null
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other == null || this::class != other::class) return false
@@ -88,6 +104,7 @@ public data class NMDNSAnnouncer(
      * broadcast packet
      */
     public fun broadcast() {
+        this.onBroadcastCallback?.invoke()
         this.server.send(packet)
     }
 
@@ -95,6 +112,7 @@ public data class NMDNSAnnouncer(
      * unregister service
      */
     public fun unregister() {
+        this.onUnregisterCallback?.invoke()
         this.server.destroy()
     }
 }
@@ -140,10 +158,12 @@ public fun registerService(
     mdnsPort: Int = 9872,
     bindAddress: String,
     txtRecords: List<String>,
+    callback: NMDNSAnnouncer.() -> Unit = {},
 ): NMDNSAnnouncer {
-    val server = createSocket()
+    val socket = createSocket()
         .bind(bindAddress, port)
-    return NMDNSAnnouncer(
+
+    val server = NMDNSAnnouncer(
         serviceType,
         serviceName,
         hostname,
@@ -151,9 +171,12 @@ public fun registerService(
         port,
         mdnsPort,
         txtRecords,
-        server,
+        socket,
         buildPacket(serviceType, "$serviceName.$serviceType", hostname, ipAddress, port, txtRecords),
     )
+    server.callback()
+    server.onRegisterCallback?.invoke()
+    return server
 }
 
 internal fun buildPacket(

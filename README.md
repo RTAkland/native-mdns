@@ -20,6 +20,9 @@ Supported record type
 3. SRV
 4. TXT
 
+Supported features
+1. Event hooking(Kotlin only)
+
 > AAAA is not supported
 
 AirPlay2(_airplay._tcp.local.) is tested
@@ -53,7 +56,21 @@ val service = registerService(
     bindAddress = "192.168.10.104",
     mdnsPort = 5356,
     txtRecords = listOf("key1=value1", "key2=value2")
-)
+) {
+    // This block is optional
+    // Event hooking in this block
+    onBroadcast {
+        println("broadcasted")
+    }
+
+    onRegister {
+        println("reg")
+    }
+
+    onUnregistered {
+        println("unreg")
+    }
+}
 while (true) {
     service.broadcast()
     delay(2000L) // or use cn.rtast.nmdns.sleep1(2) sleep 2 seconds, this function is not a suspended function
