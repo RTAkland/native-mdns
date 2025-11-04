@@ -161,7 +161,7 @@ public fun registerService(
     callback: NMDNSAnnouncer.() -> Unit = {},
 ): NMDNSAnnouncer {
     val socket = createSocket()
-        .bind(bindAddress, port)
+        .bind(bindAddress, mdnsPort)
 
     val server = NMDNSAnnouncer(
         serviceType,
