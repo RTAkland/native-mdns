@@ -1,12 +1,13 @@
 # native-mdns
 
-A Kotlin multiplatform library for mdns announcer(mdns server), only broadcast is supported, 
+A Kotlin multiplatform library for mdns announcer(mdns server), only broadcast is supported,
 
 Also, nmdns can be compiled to shared/static lib for other languages calling, see [c++ example](#cpp)
 
-mDNS is usually used for Apple's AirPlay protocol family, there's an example in README.md [How to use](#How-to-use) 
+mDNS is usually used for Apple's AirPlay protocol family, there's an example in README.md [How to use](#How-to-use)
 
 Supported platforms:
+
 1. windows64(mingwx64)
 2. linuxX64
 3. linuxArm64
@@ -14,13 +15,25 @@ Supported platforms:
 5. macosX64
 6. jvm(11 or later)
 
+
+Platform implementations are based on:
+
+- Apple: posix socket
+- Windows: WinSock
+- Linux: posix socket
+- JVM: `java.net.MulticastSocket`
+
+No external dependencies required.
+
 Supported record type
+
 1. A
 2. PTR
 3. SRV
 4. TXT
 
 Supported features
+
 1. Event hooking(Kotlin only)
 
 > AAAA is not supported

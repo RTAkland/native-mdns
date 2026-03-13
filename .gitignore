@@ -46,3 +46,4 @@ bin/
 
 .idea/
 /src/nativeInterop/cinterop/def/
+/src/cinterop/win32_join_multicast_group.def

@@ -1,0 +1,3 @@
+headers = {{PATH}}/clibs/win32_join_multicast.h
+compilerOpts = -I{{PATH}}/clibs
+linkerOpts = {{PATH}}/src/cinterop/libwin32_join_multicast_group.a -lws2_32

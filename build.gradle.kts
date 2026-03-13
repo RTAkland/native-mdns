@@ -2,9 +2,10 @@ import com.vanniktech.maven.publish.SonatypeHost
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
-    kotlin("multiplatform") version "2.2.0"
+    kotlin("multiplatform") version "2.3.10"
     id("com.vanniktech.maven.publish") version "0.31.0-rc2"
     id("signing")
+    id("cn.rtast.kdef") version "0.1.1"
 }
 
 val libVersion: String by project
@@ -20,7 +21,14 @@ kotlin {
     val nativeTargets = listOf(
         linuxArm64(),
         linuxX64(),
-        mingwX64(),
+        mingwX64 {
+            compilations["main"].cinterops {
+                @Suppress("UNUSED")
+                val joinMulticastGroup by creating {
+                    definitionFile = file("src/cinterop/win32_join_multicast_group.def")
+                }
+            }
+        },
         macosArm64(),
         macosX64()
     )
@@ -125,4 +133,9 @@ tasks.register("linkSharedLibrary") {
     dependsOn(tasks.named("linkReleaseSharedLinuxX64"))
     dependsOn(tasks.named("linkReleaseSharedMacosArm64"))
     dependsOn(tasks.named("linkReleaseSharedMingwX64"))
+}
+
+kdef {
+    outputDir = file("src/cinterop")
+    defFiles.add(file("src/cinterop/template/win32_join_multicast_group.def"))
 }

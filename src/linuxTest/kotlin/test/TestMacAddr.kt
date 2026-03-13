@@ -7,7 +7,7 @@
 
 package test
 
-import cn.rtast.nmdns.randomMacAddress
+import cn.rtast.nmdns.util.randomMacAddress
 import kotlin.test.Test
 
 class TestMacAddr {

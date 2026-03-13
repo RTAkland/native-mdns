@@ -7,7 +7,7 @@
 
 package test
 
-import cn.rtast.nmdns.randomMacAddress
+import cn.rtast.nmdns.util.randomMacAddress
 import cn.rtast.nmdns.registerService
 import cn.rtast.nmdns.sleep1
 import kotlin.test.Test
